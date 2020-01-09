@@ -9,13 +9,11 @@ import defaultSettings from '../src/defaultSettings';
 //const API_URL = 'http://demo.51zzd.cn/cmbc/';
 //const API_URL = 'http://192.168.254.153:8080/cmbc/';
 //const API_URL = 'https://xlzx.geenti.com/api/manager/';
-const API_URL = 'http://demo.xlzx_lgg.com/admin/'
-//const API_URL = 'http://demo.ichhe.com/admin/'
-//const UPLOAD_URL = 'http://demo.51zzd.cn';
-//const UPLOAD_URL = 'http://imtest.cmbc.com.cn:8082';
+//const API_URL = 'http://demo.xlzx_lgg.com/admin/'
+const API_URL = 'https://www.dongjinyd.com/admin/'
 
 //const UPLOAD_URL = 'http://msic.cmbc.com.cn:10080';
-const UPLOAD_URL = 'http://192.168.254.153:8080';
+const UPLOAD_URL = 'https://www.dongjinyd.com/admin/';
 
 export default {
   // add for transfer to umi
