@@ -54,12 +54,12 @@ export default [
         icon: 'solution',
         component: './Trade/index',
       },
-      {
-        path: '/paytrade',
-        name: 'paytrade',
-        icon: 'shop',
-        component: './Paytrade/index',
-      },
+      // {
+      //   path: '/paytrade',
+      //   name: 'paytrade',
+      //   icon: 'shop',
+      //   component: './Paytrade/index',
+      // },
       {
         path: '/vip',
         name: 'vip',

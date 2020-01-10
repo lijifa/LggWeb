@@ -166,13 +166,18 @@ export default class Item extends Component {
     const { valsArray, queryParam } = this.state
 
     const columns_1 = [{
+      title: '问题ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: '80px'
+    },{
       title: '问题标题',
       dataIndex: 'title',
       key: 'title'
     }, {
       title: '操作',
       key: 'action',
-      width: '120px',
+      width: '60px',
       className: 'table_c',
       render: (text, record) => {
         return (
