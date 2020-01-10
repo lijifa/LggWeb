@@ -16,7 +16,6 @@ const namespace = 'question';
 
 export default class Item extends Component {
   state = {
-    detailData: null,
     detailVisible: false,
     editVisible: false,
     queryParam: {
@@ -38,6 +37,27 @@ export default class Item extends Component {
     this.searchList()
   }
 
+  // 当编辑时回显已选择的valsArray
+  getValsArray() {
+    let chooseQsKey = this.props.choosQsKey
+    if (chooseQsKey.length < 1) {
+      return;
+    }
+    let listData = this.props.result.data.list || []
+    let valsArrayTemp = []
+
+    listData.map((item) => {
+      if (chooseQsKey.indexOf(item.id.toString()) >= 0) {
+        valsArrayTemp.push(item)
+      }
+    })
+    console.log('=======val======');
+    console.log(valsArrayTemp);
+    this.setState({
+      valsArray: valsArrayTemp
+    })
+  }
+
   /* 列表初始化 */
   searchList() {
     const { dispatch } = this.props;
@@ -46,6 +66,8 @@ export default class Item extends Component {
     dispatch({
       type: `${namespace}/search`,
       payload: queryParam
+    }).then(() => {
+      this.getValsArray()
     });
   }
 
@@ -118,7 +140,7 @@ export default class Item extends Component {
     const { keysArray } = this.state
     console.log('kChoose = (target)    keysArray')
     console.log(target, keysArray)
-    if (keysArray.indexOf(target.toString()) >= 0) {
+    if (keysArray.indexOf(target) >= 0) {
       return true;
     }else{
       return false
@@ -140,7 +162,7 @@ export default class Item extends Component {
   //删除
   onDelete (key) {
     const { keysArray, valsArray } = this.state;
-    this.setState({ valsArray: valsArray.filter(item => item.key !== key) });
+    this.setState({ valsArray: valsArray.filter(item => item.key != key) });
 
     let keyIndex = keysArray.indexOf(key);
     if (keyIndex != -1) {
@@ -238,7 +260,7 @@ export default class Item extends Component {
 
         return {
           key: id,
-          id,
+          id: id.toString(),
           question_no,
           title,
         }
