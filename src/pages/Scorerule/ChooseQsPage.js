@@ -115,10 +115,10 @@ export default class Item extends Component {
 
   //选择
   checkChoose = (target) => {
-    console.log('kChoose = (target)    target')
-    console.log(target)
     const { keysArray } = this.state
-    if (keysArray.indexOf(target) >= 0) {
+    console.log('kChoose = (target)    keysArray')
+    console.log(target, keysArray)
+    if (keysArray.indexOf(target.toString()) >= 0) {
       return true;
     }else{
       return false
@@ -169,6 +169,11 @@ export default class Item extends Component {
       title: '问题ID',
       dataIndex: 'id',
       key: 'id',
+      width: '80px'
+    },{
+      title: '题号',
+      dataIndex: 'question_no',
+      key: 'question_no',
       width: '80px'
     },{
       title: '问题标题',
@@ -227,12 +232,14 @@ export default class Item extends Component {
       tableData = list.map((item, idx) => {
         const {
           id,
+          question_no,
           title,
         } = item
 
         return {
           key: id,
           id,
+          question_no,
           title,
         }
       })

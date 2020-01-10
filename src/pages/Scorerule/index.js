@@ -172,9 +172,10 @@ export default class Item extends Component {
     const columns = [
       { title: '分类ID', width: 150, dataIndex: 'typename', key: 'typename' },
       { title: '规则名称', width: 200, dataIndex: 'rule_name', key: 'rule_name' },
-      { title: '题号区间', dataIndex: 'nums', key: 'nums' },
-      { title: '核算规则', dataIndex: 'rule_str', key: 'rule_str' },
-      { title: '简单描述', width: 300, dataIndex: 'content_1', key: 'content_1' },
+      { title: '已选题号ID', width: 200, dataIndex: 'nums', key: 'nums' },
+      { title: '题号区间', width: 200, dataIndex: 'qs_no', key: 'qs_no' },
+      { title: '核算规则', width: 80, dataIndex: 'rule_str', key: 'rule_str' },
+      { title: '简单描述', dataIndex: 'content_1', key: 'content_1' },
       { title: '操作',
         key: 'operation',
         width: 100,
@@ -213,6 +214,7 @@ export default class Item extends Component {
           typename,
           rule_name,
           nums,
+          qs_no,
           rule_str,
           state,
           score_type,
@@ -230,6 +232,7 @@ export default class Item extends Component {
           typename,
           rule_name,
           nums,
+          qs_no,
           rule_str,
           state,
           score_type,
@@ -260,7 +263,7 @@ export default class Item extends Component {
             columns={columns}
             dataSource={tableData}
             size='small'
-            scroll={{x: 800}}
+            scroll={{x: 1200}}
             pagination={tablePagination}
           />
         </Card>

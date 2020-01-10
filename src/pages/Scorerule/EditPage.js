@@ -25,6 +25,7 @@ class EditPage extends Component {
   state = {
     choosQsKey: this.props.detailData ? this.props.detailData.nums.split(',') : [],
     ids: this.props.detailData ? this.props.detailData.nums : '',
+    qs_no: this.props.detailData ? this.props.detailData.qs_no : '',
     tid: this.props.detailData ? this.props.detailData.question_type_id : '',
     editModel: false
   };
@@ -32,7 +33,7 @@ class EditPage extends Component {
     e.preventDefault();
 
     const { dispatch, form, detailData, onReturnList } = this.props;
-    const { tid, ids } = this.state;
+    const { tid, ids, qs_no } = this.state;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -43,6 +44,7 @@ class EditPage extends Component {
         score_type: fieldsValue.score_type,
         rule_str: fieldsValue.rule_str,
         nums: ids,
+        nums: qs_no,
         content_1: fieldsValue.content_1,
         content_2: fieldsValue.content_2,
         content_3: fieldsValue.content_3,
@@ -91,13 +93,22 @@ class EditPage extends Component {
   choosOptions = (e, k) => {
     console.log('e, k==========')
     console.log(e, k)
-    let chooseTmp=[],chooseVal = ''
+    //选择ID
+    let chooseTmp=[], chooseVal = ''
     chooseTmp = e.map((item)=>{
       return item.id
     })
     chooseVal = chooseTmp.join(',')
+
+    //选择题号
+    let chooseTmp2=[], chooseVal2 = ''
+    chooseTmp2 = e.map((item)=>{
+      return item.question_no
+    })
+    chooseVal2 = chooseTmp2.join(',')
     this.setState({
       ids: chooseVal,
+      qs_no: chooseVal2,
       choosQsKey: k
     })
   }
