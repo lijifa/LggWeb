@@ -6,7 +6,7 @@ import styles from './UserLayout.less';
 
 const copyright = (
   <Fragment>
-    中国民生银行 2019 Bate1.20190327.19
+    心理测试 2019 Bate1.20200120.12
   </Fragment>
 );
 

@@ -170,13 +170,13 @@ class BasicLayout extends React.PureComponent {
       }
     });
     if (!currRouterData) {
-      return '中国民生银行';
+      return '心理咨询';
     }
     const message = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     });
-    return `${message} - 中国民生银行`;
+    return `${message} - 心理咨询`;
   };
 
   getLayoutStyle = () => {
