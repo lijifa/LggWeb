@@ -1,7 +1,7 @@
-import { query, queryAll, add, update, del } from '@/services/oper';
+import { query, queryAll, add, update, del } from '@/services/order';
 
 export default {
-  namespace: 'oper',
+  namespace: 'order',
 
   state: {
     data: {

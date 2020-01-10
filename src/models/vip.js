@@ -1,22 +1,22 @@
-import { query, queryAll, add, edit } from '@/services/vip';
+import { query, queryAll, add, update, del } from '@/services/vip';
 
 export default {
   namespace: 'vip',
 
   state: {
     data: {
-      code: "00",
-      data: {
-        totalRow: 0,
-        pageNumber: 0,
-        firstPage: true,
-        lastPage: true,
-        totalPage: 0,
-        pageSize: 15,
-        list: []
+      code : '00',
+      msg : '操作成功',
+      data : {
+        totalRow : 0,
+        pageNumber : 1,
+        firstPage : true,
+        lastPage : true,
+        totalPage : 1,
+        pageSize : 15,
+        list : [],
       },
-      msg: "操作成功",
-      token: "",
+      token : '',
     },
     editRes:{},
   },
@@ -43,17 +43,23 @@ export default {
         payload: response,
       });
     },
-    *edit({ payload, callback }, { call, put }) {
-      const response = yield call(edit, payload);
-      if (callback && typeof callback === 'function') {
-        callback(response);
-      };
-    },
     *add({ payload, callback }, { call, put }) {
       const response = yield call(add, payload);
       if (callback && typeof callback === 'function') {
-        callback(response);
-      };
+        callback(response); // 返回结果
+      }
+    },
+    *update({ payload, callback }, { call, put }) {
+      const response = yield call(update, payload);
+      if (callback && typeof callback === 'function') {
+        callback(response); // 返回结果
+      }
+    },
+    *del({ payload, callback }, { call, put }) {
+      const response = yield call(del, payload);
+      if (callback && typeof callback === 'function') {
+        callback(response); // 返回结果
+      }
     },
   },
 

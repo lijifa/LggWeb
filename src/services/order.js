@@ -1,7 +1,7 @@
 import request from '@/utils/request';
 
 export async function query(params) {
-  return request('/admin/user/query', {
+  return request('/admin/order/query', {
     method: 'POST',
     body: {
       ...params
@@ -10,7 +10,7 @@ export async function query(params) {
 }
 
 export async function add(params) {
-  return request('/admin/user/add', {
+  return request('/admin/order/add', {
     method: 'POST',
     body: {
       ...params
@@ -19,7 +19,7 @@ export async function add(params) {
 }
 
 export async function update(params) {
-  return request('/admin/user/edit', {
+  return request('/admin/order/edit', {
     method: 'POST',
     body: {
       ...params
@@ -28,7 +28,7 @@ export async function update(params) {
 }
 
 export async function del(params) {
-  return request('/admin/user/del', {
+  return request('/admin/order/del', {
     method: 'POST',
     body: {
       ...params

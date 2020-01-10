@@ -1,38 +1,30 @@
 import React, { Component, Fragment } from 'react';
-import { Row, Col, Card, Form, Input, Button, Table, Icon, Divider, Drawer, Popconfirm, Modal, message } from 'antd';
+import { Row, Card, Form, Input, Button, Table, Icon, Drawer, Divider, Popconfirm } from 'antd';
 import { connect } from 'dva';
-import md5 from 'blueimp-md5'
-import {formatTime, responseMsg, getObjStatus, getObjName} from '@/utils/utils';
-import StatusSelect from '@/components/MsStatusSelect';
+import {formatTime, responseMsg, getObjStatus} from '@/utils/utils';
 import styles from '../TableList.less';
 import EditPage from './EditPage';
 import DetailPage from './DetailPage';
+import QuestionTypeSelect from '@/components/MsQuestionTypeSelect';
+
 const FormItem = Form.Item;
-const operStatusSelect =  [
-  {key: 0, value: '启用'},
-  {key: 1, value: '暂停'},
-  {key: 9, value: '注销'}
-]
-const operTypeSelect =  [
-  {key: 0, value: '系统'},
-  {key: 1, value: '机构'},
-  {key: 2, value: '门店'}
-]
 const namespace = 'oper';
+const stateSelect =  [
+  {key: 0, value: '正常'},
+  {key: 1, value: '禁用'}
+]
 @connect(({ oper, loading }) => ({
   result: oper.data,
-  queryLoading: loading.effects['oper/search'],
+  dataLoading: loading.effects['oper/search'] ? true : false,
 }))
 @Form.create()
 
-export default class Item extends Component {
+export default class Trade extends Component {
+
   state = {
     detailData: null,
     detailVisible: false,
     editVisible: false,
-    pwdModalVisible: false,
-    newpwd: '',
-    newpwd2: '',
     queryParam: {
       pageNumber: 1,
       pageSize: 15,
@@ -50,6 +42,7 @@ export default class Item extends Component {
   searchList() {
     const { dispatch } = this.props;
     const { queryParam } = this.state
+  
     dispatch({
       type: `${namespace}/search`,
       payload: queryParam
@@ -99,16 +92,18 @@ export default class Item extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline" className="search">
         <div className="kuai">
-          <span className="span">操作员名称 :</span>
+          <span className="span">会员名 :</span>
           <FormItem className="inputW160">
-            {getFieldDecorator('operName')(<Input placeholder="请输入操作员名称" />)}
+            {getFieldDecorator('title')(<Input placeholder="请输入会员名" />)}
           </FormItem>
         </div>
 
         <div className="kuai">
-          <span className="span">登录账户 :</span>
+          <span className="span">分类问题 :</span>
           <FormItem className="inputW160">
-            {getFieldDecorator('loginName')(<Input placeholder="请输入登录名" />)}
+            {getFieldDecorator('question_type_id')(
+              <QuestionTypeSelect placeholder="请选择分类问题" />
+            )}
           </FormItem>
         </div>
 
@@ -126,12 +121,12 @@ export default class Item extends Component {
     );
   }
 
- /* 删除操作 */
+  /* 删除操作 */
   handleDel = e => {
     const { dispatch } = this.props;
 
     let queryParam = {
-      operMapId: e.operMapId
+      id: e.id
     }
     dispatch({
       type: `${namespace}/del`,
@@ -149,6 +144,7 @@ export default class Item extends Component {
     });
   };
 
+  /* 弹出/隐藏 详情 */
   detailDrawer = (res='') =>{
     const { detailVisible } = this.state;
     this.setState({
@@ -157,6 +153,7 @@ export default class Item extends Component {
     })
   }
 
+  /* 弹出/隐藏 编辑 */
   editDrawer = (res='') =>{
     const { editVisible } = this.state;
     this.setState({
@@ -165,88 +162,29 @@ export default class Item extends Component {
     })
   }
 
-  changePwdModal = (res) => {
-    const { pwdModalVisible } = this.state
+  /* 弹出/隐藏 答案 */
+  editAnswerDrawer = (res='') =>{
+    const { editAnswerVisible } = this.state;
     this.setState({
-      pwdModalVisible: !pwdModalVisible
+      editAnswerVisible: !editAnswerVisible,
+      detailData: !editAnswerVisible ? res : ''
     })
-
-    if (!pwdModalVisible) {
-      this.setState({
-        detailData: res
-      })
-    }else{
-      this.setState({
-        detailData: '',
-        newpwd: '',
-        newpwd2: '',
-      })
-    }
   }
-
-  changePwdValue = (val, type) => {
-    if (type == 1) {
-      this.setState({
-        newpwd: val
-      })
-    }else{
-      this.setState({
-        newpwd2: val
-      })
-    }
-  }
-
-  changePwdSubmit = () => {
-    const { newpwd, newpwd2, detailData } = this.state
-    if (newpwd == '' || newpwd2 == '') {
-      message.error('修改密码不可为空！')
-      return;
-    }
-    if (newpwd != newpwd2) {
-      message.error('两次密码输入不一致，请重新输入！')
-      return;
-    }
-
-    const { dispatch } = this.props;
-    const values = {
-      operMapId: detailData.operMapId,
-      newpwd: md5(newpwd).toUpperCase(),
-    };
-
-    dispatch({
-      type: `${namespace}/update`,
-      payload: values,
-      callback: (res) => {
-        if (res) {
-          if (res.code == '00') {
-            responseMsg(res)
-            this.changePwdModal()
-          }else{
-            responseMsg(res)
-          }
-        }
-      }
-    });
-  };
-
   render() {
-    const {detailData, detailVisible, editVisible, queryParam, pwdModalVisible} = this.state
-
+    const {detailData, detailVisible, editVisible, editAnswerVisible, queryParam} = this.state
     const columns = [
-      { title: '编号', width: 120, dataIndex: 'operMapId', key: 'operMapId' },
-      { title: '操作员名称', dataIndex: 'operName', key: 'operName' },
-      { title: '登录名', dataIndex: 'loginName', key: 'loginName' },
-      { title: '状态', dataIndex: 'operStatusName', key: 'operStatusName' },
-      { title: '添加时间', dataIndex: 'createTime', key: 'createTime' },
+      { title: '用户名', width: 120, dataIndex: 'username', key: 'username' },
+      { title: '昵称', width: 150, dataIndex: 'nickname', key: 'nickname' },
+      { title: '级别', dataIndex: 'level', key: 'level' },
+      { title: '会员状态', dataIndex: 'stateName', key: 'stateName' },
+      { title: '添加时间', dataIndex: 'create_time', key: 'create_time' },
       { title: '操作',
         key: 'operation',
-        width: 180,
+        width: 200,
         fixed: 'right',
         render: (text, record) => (
           <Fragment>
-            <a onClick={() => { this.editDrawer(record) }}>修改</a>
-            <Divider type="vertical" />
-            <a onClick={() => { this.changePwdModal(record) }}>修改密码</a>
+            <a onClick={()=>{this.editDrawer(record)}}>详情</a>
             <Divider type="vertical" />
             <Popconfirm placement="topRight" title="你确定要执行此操作吗?" onConfirm={() => { this.handleDel(record) }}>
               <a>删除</a>
@@ -256,8 +194,7 @@ export default class Item extends Component {
       },
     ];
     
-    const {result, queryLoading} = this.props
-    const listData = result ? result.data : {}
+    const listData = this.props.result.data || {}
     const tablePagination = {
       total: listData.totalRow || 0,
       current: queryParam.pageNumber,
@@ -269,43 +206,31 @@ export default class Item extends Component {
 
     let tableData = null
     let list = listData.list
+
     if (list) {
       tableData = list.map((item, idx) => {
         const {
-          operMapId,
-          roleId,
-          operType,
-          operName,
-          operStatus,
-          deptMapId,
-          orgMapId,
-          shopMapId,
-          loginName,
-          loginPwd,
-          createTime,
-          updateTime,
-          operEmail,
-          org
+          id,
+          username,
+          password,
+          nickname,
+          level,
+          state,
+          create_time,
+          update_time
         } = item
 
         return {
           key: idx,
-          operMapId,
-          roleId,
-          operType,
-          operTypeName: getObjStatus(operTypeSelect, operType),
-          operName,
-          operStatus,
-          operStatusName: getObjStatus(operStatusSelect, operStatus),
-          deptMapId,
-          orgMapId,
-          orgName: getObjName(org, 'orgName'),
-          shopMapId,
-          loginName,
-          loginPwd,
-          operEmail,
-          createTime: formatTime(createTime),
-          updateTime: formatTime(updateTime)
+          id,
+          username,
+          password,
+          nickname,
+          level,
+          state,
+          stateName: getObjStatus(stateSelect, state),
+          create_time,
+          update_time
         }
       })
     }
@@ -318,13 +243,12 @@ export default class Item extends Component {
         </Row>
         <Card key={'b'}
           className={styles.tableListTitle}
-          title={<span className={styles.tableTitle}><Icon type="appstore-o" /> 操作员列表
+          title={<span className={styles.tableTitle}><Icon type="appstore-o" /> 问题列表
                     <span className="pagenum"> (共 {tablePagination.total} 条记录)</span>
                   </span>}
           extra={<Button type="primary" onClick={()=>{this.editDrawer()}}>添加</Button>}
         >
           <Table
-            loading={queryLoading}
             bordered
             columns={columns}
             dataSource={tableData}
@@ -336,7 +260,7 @@ export default class Item extends Component {
         <Drawer
           title="详情"
           placement="right"
-          width={'24%'}
+          width={'30%'}
           destroyOnClose={true}
           onClose={this.detailDrawer}
           visible={detailVisible}
@@ -345,9 +269,9 @@ export default class Item extends Component {
         </Drawer>
 
         <Drawer
-          title= {detailData ? '编辑' : '添加'}
+          title={detailData ? '编辑' : '添加'}
           placement="right"
-          width={'40%'}
+          width={'30%'}
           destroyOnClose={true}
           onClose={this.editDrawer}
           visible={editVisible}
@@ -370,37 +294,21 @@ export default class Item extends Component {
           />
         </Drawer>
 
-        <Modal
-          title="修改密码"
-          centered
+        <Drawer
+          title={'编辑答案'}
+          placement="right"
+          width={'50%'}
           destroyOnClose={true}
-          visible={pwdModalVisible}
-          bodyStyle={{textAlign:'center'}}
-          width={320}
-          height={440}
-          // footer={null}
+          onClose={this.editAnswerDrawer}
+          visible={editAnswerVisible}
           maskClosable={false}
-          onCancel={()=>{this.changePwdModal()}}
-          onOk={() => {this.changePwdSubmit()}}
+          style={{
+            height: 'calc(100% - 55px)',
+            overflow: 'auto',
+            paddingBottom: 53,
+          }}
         >
-          <Form layout='inline'>
-            <FormItem label="新的密码">
-              <Input
-                type="password"
-                onChange={(val)=>this.changePwdValue(val.target.value, 1)}
-                //onPressEnter={() => this.changePwdSubmit()}
-              />
-            </FormItem>
-
-            <FormItem label="再输一次">
-              <Input
-                type="password"
-                onChange={(val)=>this.changePwdValue(val.target.value, 2)}
-                //onPressEnter={() => this.changePwdSubmit()}
-              />
-            </FormItem>
-          </Form>
-        </Modal>
+        </Drawer>
       </div>
     );
   }

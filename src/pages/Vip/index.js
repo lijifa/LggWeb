@@ -1,20 +1,26 @@
 import React, { Component, Fragment } from 'react';
-import { Row, Card, Form, Input, Button, Table, Icon, Drawer } from 'antd';
+import { Row, Card, Form, Input, Button, Table, Icon, Drawer, Divider, Popconfirm } from 'antd';
 import { connect } from 'dva';
-import {formatTime, responseMsg} from '@/utils/utils';
+import {formatTime, responseMsg, getObjStatus} from '@/utils/utils';
 import styles from '../TableList.less';
 import EditPage from './EditPage';
 import DetailPage from './DetailPage';
+import QuestionTypeSelect from '@/components/MsQuestionTypeSelect';
+
 const FormItem = Form.Item;
 const namespace = 'vip';
-
+const stateSelect =  [
+  {key: 0, value: '正常'},
+  {key: 1, value: '禁用'}
+]
 @connect(({ vip, loading }) => ({
   result: vip.data,
   dataLoading: loading.effects['vip/search'] ? true : false,
 }))
 @Form.create()
 
-export default class Item extends Component {
+export default class Trade extends Component {
+
   state = {
     detailData: null,
     detailVisible: false,
@@ -86,15 +92,18 @@ export default class Item extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline" className="search">
         <div className="kuai">
-          <span className="span">会员名称 :</span>
+          <span className="span">会员名 :</span>
           <FormItem className="inputW160">
-            {getFieldDecorator('nickname')(<Input placeholder="请输入会员名称" />)}
+            {getFieldDecorator('title')(<Input placeholder="请输入会员名" />)}
           </FormItem>
         </div>
+
         <div className="kuai">
-          <span className="span">会员账户 :</span>
+          <span className="span">分类问题 :</span>
           <FormItem className="inputW160">
-            {getFieldDecorator('username')(<Input placeholder="请输入会员账户" />)}
+            {getFieldDecorator('question_type_id')(
+              <QuestionTypeSelect placeholder="请选择分类问题" />
+            )}
           </FormItem>
         </div>
 
@@ -117,7 +126,7 @@ export default class Item extends Component {
     const { dispatch } = this.props;
 
     let queryParam = {
-      skuTagId: e.skuTagId
+      id: e.id
     }
     dispatch({
       type: `${namespace}/del`,
@@ -152,29 +161,40 @@ export default class Item extends Component {
       detailData: !editVisible ? res : ''
     })
   }
+
+  /* 弹出/隐藏 答案 */
+  editAnswerDrawer = (res='') =>{
+    const { editAnswerVisible } = this.state;
+    this.setState({
+      editAnswerVisible: !editAnswerVisible,
+      detailData: !editAnswerVisible ? res : ''
+    })
+  }
   render() {
-    const {detailData, detailVisible, editVisible, queryParam} = this.state
+    const {detailData, detailVisible, editVisible, editAnswerVisible, queryParam} = this.state
     const columns = [
-      { title: '会员ID', width: 120, dataIndex: 'id', key: 'id' },
-      { title: '会员账户', dataIndex: 'username', key: 'username' },
-      { title: '会员昵称', dataIndex: 'nikename', key: 'nikename' },
-      { title: '会员级别', dataIndex: 'level', key: 'level' },
-      { title: '会员状态', dataIndex: 'state', key: 'state' },
-      { title: '添加时间', dataIndex: 'createTime', key: 'createTime' },
+      { title: '会员名', width: 120, dataIndex: 'username', key: 'username' },
+      { title: '会员昵称', width: 150, dataIndex: 'nickname', key: 'nickname' },
+      { title: '会员手机', dataIndex: 'usermobile', key: 'usermobile' },
+      { title: 'OPENID', dataIndex: 'openid', key: 'openid' },
+      { title: '会员状态', dataIndex: 'stateName', key: 'stateName' },
+      { title: '添加时间', dataIndex: 'create_time', key: 'create_time' },
       { title: '操作',
         key: 'operation',
-        width: 100,
+        width: 200,
         fixed: 'right',
         render: (text, record) => (
           <Fragment>
-            <a onClick={()=>{this.editDrawer(record)}}>修改</a>
+            <a onClick={()=>{this.editDrawer(record)}}>详情</a>
+            <Divider type="vertical" />
+            <Popconfirm placement="topRight" title="你确定要执行此操作吗?" onConfirm={() => { this.handleDel(record) }}>
+              <a>删除</a>
+            </Popconfirm>
           </Fragment>
         ),
       },
     ];
     
-    console.log('this.props')
-    console.log(this.props)
     const listData = this.props.result.data || {}
     const tablePagination = {
       total: listData.totalRow || 0,
@@ -187,27 +207,34 @@ export default class Item extends Component {
 
     let tableData = null
     let list = listData.list
+
     if (list) {
       tableData = list.map((item, idx) => {
         const {
           id,
           username,
+          password,
           nickname,
-          level,
+          usermobile,
+          openid,
+          userpic,
           state,
-          updateTime,
-          createTime
+          create_time,
+          update_time
         } = item
 
         return {
           key: idx,
           id,
           username,
+          password,
           nickname,
-          level,
-          state,
-          createTime: formatTime(createTime),
-          updateTime: formatTime(updateTime)
+          usermobile,
+          openid,
+          userpic,
+          stateName: getObjStatus(stateSelect, state),
+          create_time,
+          update_time
         }
       })
     }
@@ -220,7 +247,7 @@ export default class Item extends Component {
         </Row>
         <Card key={'b'}
           className={styles.tableListTitle}
-          title={<span className={styles.tableTitle}><Icon type="appstore-o" /> 会员列表
+          title={<span className={styles.tableTitle}><Icon type="appstore-o" /> 问题列表
                     <span className="pagenum"> (共 {tablePagination.total} 条记录)</span>
                   </span>}
           extra={<Button type="primary" onClick={()=>{this.editDrawer()}}>添加</Button>}
@@ -237,7 +264,7 @@ export default class Item extends Component {
         <Drawer
           title="详情"
           placement="right"
-          width={'24%'}
+          width={'30%'}
           destroyOnClose={true}
           onClose={this.detailDrawer}
           visible={detailVisible}
@@ -248,7 +275,7 @@ export default class Item extends Component {
         <Drawer
           title={detailData ? '编辑' : '添加'}
           placement="right"
-          width={'24%'}
+          width={'30%'}
           destroyOnClose={true}
           onClose={this.editDrawer}
           visible={editVisible}
@@ -269,6 +296,22 @@ export default class Item extends Component {
               }
             }
           />
+        </Drawer>
+
+        <Drawer
+          title={'编辑答案'}
+          placement="right"
+          width={'50%'}
+          destroyOnClose={true}
+          onClose={this.editAnswerDrawer}
+          visible={editAnswerVisible}
+          maskClosable={false}
+          style={{
+            height: 'calc(100% - 55px)',
+            overflow: 'auto',
+            paddingBottom: 53,
+          }}
+        >
         </Drawer>
       </div>
     );
