@@ -48,11 +48,11 @@ export default class Item extends Component {
 
     listData.map((item) => {
       if (chooseQsKey.indexOf(item.id.toString()) >= 0) {
+        item['key'] = item.id
         valsArrayTemp.push(item)
       }
     })
-    console.log('=======val======');
-    console.log(valsArrayTemp);
+    
     this.setState({
       valsArray: valsArrayTemp
     })
@@ -162,9 +162,13 @@ export default class Item extends Component {
   //删除
   onDelete (key) {
     const { keysArray, valsArray } = this.state;
+    console.log('keysArray, valsArray=====')
+    console.log(key)
+    console.log(keysArray, valsArray)
+    console.log('keysArray, valsArray======')
     this.setState({ valsArray: valsArray.filter(item => item.key != key) });
 
-    let keyIndex = keysArray.indexOf(key);
+    let keyIndex = keysArray.indexOf(key.toString());
     if (keyIndex != -1) {
       keysArray.splice(keyIndex, 1);
       this.setState({
@@ -177,8 +181,6 @@ export default class Item extends Component {
   subChoose = () => {
     const { valsArray, keysArray} = this.state
     const { closeModel, chooseQsOption} = this.props
-    console.log('valsArray, keysArray')
-    console.log(valsArray, keysArray)
     chooseQsOption(valsArray, keysArray)
     closeModel()
   }

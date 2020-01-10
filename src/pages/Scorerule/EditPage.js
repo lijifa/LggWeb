@@ -44,14 +44,14 @@ class EditPage extends Component {
         score_type: fieldsValue.score_type,
         rule_str: fieldsValue.rule_str,
         nums: ids,
-        nums: qs_no,
+        qs_no: qs_no,
         content_1: fieldsValue.content_1,
         content_2: fieldsValue.content_2,
         content_3: fieldsValue.content_3,
       };
       console.log('values===www======')
       console.log(values)
-     
+
       dispatch({
         type: detailData ? `${namespace}/update` : `${namespace}/add`,
         payload: values,
@@ -106,6 +106,8 @@ class EditPage extends Component {
       return item.question_no
     })
     chooseVal2 = chooseTmp2.join(',')
+    console.log('chooseTmp2')
+    console.log(chooseTmp2)
     this.setState({
       ids: chooseVal,
       qs_no: chooseVal2,
