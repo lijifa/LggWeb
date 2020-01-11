@@ -81,6 +81,11 @@ class EditPage extends Component {
 
   //显示弹框
   actionModel = () => {
+    let tid = this.state.tid
+    if (!tid) {
+      message.error('请先选择分类')
+      return
+    }
     this.setState({editModel: true, dataDetail: null})
   }
 

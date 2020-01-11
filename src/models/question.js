@@ -1,4 +1,4 @@
-import { query, queryAll, add, update, del } from '@/services/question';
+import { query, queryChooseAll, add, update, del } from '@/services/question';
 
 export default {
   namespace: 'question',
@@ -36,8 +36,8 @@ export default {
         payload: response,
       });
     },
-    *queryAll({ payload }, { call, put }) {
-      const response = yield call(queryAll, payload);
+    *queryChooseAll({ payload }, { call, put }) {
+      const response = yield call(queryChooseAll, payload);
       yield put({
         type: 'querySelect',
         payload: response,

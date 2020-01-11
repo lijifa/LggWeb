@@ -10,7 +10,9 @@ const namespace = 'question';
 
 @connect(({ question, loading }) => ({
   result: question.data,
+  selectData: question.selectData,
   dataLoading: loading.effects['question/search'] ? true : false,
+  selectDataLoading: loading.effects['question/queryAll'] ? true : false,
 }))
 @Form.create()
 
@@ -27,6 +29,12 @@ export default class Item extends Component {
         "question_type_id": this.props.tid
       }
     },
+    // queryChooseParam: {
+    //   condition: {
+    //     "question_type_id": this.props.tid,
+    //     "": this.props
+    //   }
+    // },
     listData: {},
     keyStateList:[],
     keysArray: this.props.choosQsKey ? this.props.choosQsKey : [],
@@ -35,27 +43,66 @@ export default class Item extends Component {
  
   componentDidMount() {
     this.searchList()
+    this.getValsArray()
   }
 
   // 当编辑时回显已选择的valsArray
+  // getValsArray() {
+  //   let chooseQsKey = this.props.choosQsKey
+  //   if (chooseQsKey.length < 1) {
+  //     return;
+  //   }
+  //   let listData = this.props.result.data.list || []
+  //   let valsArrayTemp = []
+
+  //   listData.map((item) => {
+  //     if (chooseQsKey.indexOf(item.id) >= 0) {
+  //       item['key'] = item.id
+  //       valsArrayTemp.push(item)
+  //     }
+  //   })
+    
+  //   this.setState({
+  //     valsArray: valsArrayTemp
+  //   })
+  // }
+
+  /* 当编辑时回显获取已选择的 */
   getValsArray() {
-    let chooseQsKey = this.props.choosQsKey
-    if (chooseQsKey.length < 1) {
+    let chooseQsKeyTmp = this.props.choosQsKey
+    if (chooseQsKeyTmp.length < 1) {
       return;
     }
-    let listData = this.props.result.data.list || []
-    let valsArrayTemp = []
 
-    listData.map((item) => {
-      if (chooseQsKey.indexOf(item.id.toString()) >= 0) {
-        item['key'] = item.id
-        valsArrayTemp.push(item)
+    //转换为数字
+    let chooseQsKey = chooseQsKeyTmp.map((item) => {
+      return parseInt(item)
+    })
+
+    const { dispatch, tid } = this.props;
+    //const { queryParam } = this.state
+    let queryChooseParam = {
+      condition: {
+        "question_type_id": tid,
+        "question_no": chooseQsKey
       }
-    })
-    
-    this.setState({
-      valsArray: valsArrayTemp
-    })
+    }
+
+    dispatch({
+      type: `${namespace}/queryChooseAll`,
+      payload: queryChooseParam
+    }).then(() => {
+      const { selectData } = this.props;
+      let listDataTmp = selectData.data.list
+      let listData = listDataTmp.map((item) => {
+        item['key'] = item.id
+        return item
+      })
+      this.setState({
+        valsArray: listData,
+        keysArray: chooseQsKey
+      })
+    });
   }
 
   /* 列表初始化 */
@@ -66,9 +113,7 @@ export default class Item extends Component {
     dispatch({
       type: `${namespace}/search`,
       payload: queryParam
-    }).then(() => {
-      this.getValsArray()
-    });
+    })
   }
 
   /* 查询操作 */
@@ -168,7 +213,7 @@ export default class Item extends Component {
     console.log('keysArray, valsArray======')
     this.setState({ valsArray: valsArray.filter(item => item.key != key) });
 
-    let keyIndex = keysArray.indexOf(key.toString());
+    let keyIndex = keysArray.indexOf(key);
     if (keyIndex != -1) {
       keysArray.splice(keyIndex, 1);
       this.setState({
@@ -262,7 +307,7 @@ export default class Item extends Component {
 
         return {
           key: id,
-          id: id.toString(),
+          id: id,
           question_no,
           title,
         }

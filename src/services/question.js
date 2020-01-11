@@ -9,6 +9,15 @@ export async function query(params) {
   });
 }
 
+export async function queryChooseAll(params) {
+  return request('/admin/question/queryChooseAll', {
+    method: 'POST',
+    body: {
+      ...params
+    },
+  });
+}
+
 export async function add(params) {
   return request('/admin/question/add', {
     method: 'POST',
