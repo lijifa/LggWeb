@@ -220,6 +220,7 @@ export default class Item extends Component {
           score_type,
           create_time,
           update_time,
+          audio_path,
           content_1,
           content_2,
           content_3
@@ -238,6 +239,7 @@ export default class Item extends Component {
           score_type,
           create_time,
           update_time,
+          audio_path: audio_path ? audio_path : '',
           content_1,
           content_2,
           content_3
