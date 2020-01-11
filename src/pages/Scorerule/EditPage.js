@@ -6,6 +6,7 @@ import styles from './styles.less';
 import StatusSelect from '@/components/MsStatusSelect';
 import ChooseQsPage from './ChooseQsPage';
 import QuestionTypeSelect from '@/components/MsQuestionTypeSelect';
+import UploadFiles from '@/components/LggUploadFiles';
 const typeSelect =  [
   {key: 0, value: '总分'},
   {key: 1, value: '分项分'},
@@ -27,13 +28,14 @@ class EditPage extends Component {
     ids: this.props.detailData ? this.props.detailData.nums : '',
     qs_no: this.props.detailData ? this.props.detailData.qs_no : '',
     tid: this.props.detailData ? this.props.detailData.question_type_id : '',
-    editModel: false
+    editModel: false,
+    audio_path: this.props.detailData ? this.props.detailData.audio_path : ''
   };
   handleSubmit = e => {
     e.preventDefault();
 
     const { dispatch, form, detailData, onReturnList } = this.props;
-    const { tid, ids, qs_no } = this.state;
+    const { tid, ids, qs_no, audio_path } = this.state;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -45,6 +47,7 @@ class EditPage extends Component {
         rule_str: fieldsValue.rule_str,
         nums: ids,
         qs_no: qs_no,
+        audio_path: audio_path,
         content_1: fieldsValue.content_1,
         content_2: fieldsValue.content_2,
         content_3: fieldsValue.content_3,
@@ -120,6 +123,12 @@ class EditPage extends Component {
     })
   }
 
+  onChangeFile = (e) => {
+    this.setState({
+      audio_path: e
+    })
+  }
+
   render() {
     const { detailData } = this.props;
     const { ids, choosQsKey, editModel, tid } = this.state;
@@ -142,6 +151,9 @@ class EditPage extends Component {
              
               <Button onClick={() => this.actionModel()} style={{disabled: ids ? false : true}}>{ids ? '当前已选择 '+choosQsKey.length : '当前未选择'}</Button>
               
+            </FormItem>
+            <FormItem label='上传音频'>
+              <UploadFiles onChange={(e) => this.onChangeFile(e)}/>
             </FormItem>
             <FormItem label='计分类型'>
               {getFieldDecorator('score_type', Object.assign({}, decoratorConfig, {initialValue: detailData ? detailData.score_type : 1}))
